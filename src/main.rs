@@ -1,4 +1,5 @@
 use std::io;
+use std::io::Write;
 
 use rand::Rng; // 随机数生成器
 
@@ -18,8 +19,9 @@ fn main() {
 
         }
 
-        println!("请输入你的猜测：");
-        
+        print!("请输入你的猜测：");
+        io::stdout().flush().expect("刷新输出缓冲区失败"); // 刷新缓冲区（由于print!宏没有换行符，故行缓冲模式不会自动刷新缓冲区）
+
         let mut guess = String::new();
 
         io::stdin()
@@ -37,10 +39,10 @@ fn main() {
 
         // 判断
         if guess > secret_number {
-            println!("太大了！");
+            println!("太大了！\n");
             cycle_count += 1;
         } else if guess < secret_number {
-            println!("太小了！");
+            println!("太小了！\n");
             cycle_count += 1;
         } else if guess == secret_number {
             println!("你猜对了！你之前猜错了{cycle_count}次。");
