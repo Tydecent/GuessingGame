@@ -1,13 +1,36 @@
 use std::io;
 use std::io::Write;
+use std::env;
 
 use rand::Rng; // 随机数生成器
 
 fn main() {
+
+    let args: Vec<String> = env::args().collect();  // 获取所有启动参数
+    let mut _debugmode = false;               // 调试模式标志位 - 保留备用
+    let mut easter_egg_1 = false;           // 彩蛋#1标志位
+
+    // 遍历参数
+    for i in 1..args.len() {
+        let now_arg = &args[i];
+
+        match now_arg.as_str() {
+            "-debug" => _debugmode = true,
+
+            "taskarg" => easter_egg_1 = true,
+
+            other => println!("未知的参数：{}", other)
+        }
+    }
+
     println!("欢迎来到猜数字游戏");
 
     // 生成随机数
-    let secret_number: u8 = rand::rng().random_range(1..101);
+    let secret_number: u8 = if !easter_egg_1 {
+        rand::rng().random_range(1..101)
+    } else {
+        1
+    };
     
     // 猜错计数
     let mut cycle_count: u32 = 0;
