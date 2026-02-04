@@ -8,10 +8,12 @@ fn main() {
 
     let args: Vec<String> = env::args().collect();  // 获取所有启动参数
     let mut _debugmode = false;               // 调试模式标志位 - 保留备用
+    let mut custom_number: (bool, u8) = (false, 0); // 自定义数字标志位
     let mut easter_egg_1 = false;           // 彩蛋#1标志位
 
     // 遍历参数
-    for i in 1..args.len() {
+    let mut i = 1;
+    while i < args.len() {
         let now_arg = &args[i];
 
         match now_arg.as_str() {
@@ -19,17 +21,42 @@ fn main() {
 
             "taskarg" => easter_egg_1 = true,
 
+            "-num" => {
+                if i+1 < args.len() {
+                    let num = &args[i+1];
+
+                    if let Ok(n @ 1..=100) = num.parse::<u8>() {
+                        
+                        let num: u8 = n;
+
+                        custom_number = (true, *&num);
+
+                        // 跳过下一个参数，因为
+                        i += 1;
+                        
+                    } else {
+                        println!("错误：参数-num的无效输入{}", num);
+                    }
+                    
+                } else {
+                    println!("错误：参数-num未指定值");
+                }
+            }
+
             other => println!("未知的参数：{}", other)
         }
+        i += 1;
     }
 
     println!("欢迎来到猜数字游戏");
 
     // 生成随机数
-    let secret_number: u8 = if !easter_egg_1 {
-        rand::rng().random_range(1..101)
-    } else {
+    let secret_number: u8 = if easter_egg_1 {
         1
+    } else if custom_number.0 {
+        *&custom_number.1
+    } else {
+        rand::rng().random_range(1..100)
     };
     
     // 猜错计数
