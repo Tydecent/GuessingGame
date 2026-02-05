@@ -1,15 +1,14 @@
+use std::env;
 use std::io;
 use std::io::Write;
-use std::env;
 
 use rand::Rng; // 随机数生成器
 
 fn main() {
-
-    let args: Vec<String> = env::args().collect();  // 获取所有启动参数
-    let mut _debugmode = false;               // 调试模式标志位 - 保留备用
+    let args: Vec<String> = env::args().collect(); // 获取所有启动参数
+    let mut _debugmode = false; // 调试模式标志位 - 保留备用
     let mut custom_number: (bool, u8) = (false, 0); // 自定义数字标志位
-    let mut easter_egg_1 = false;           // 彩蛋#1标志位
+    let mut easter_egg_1 = false; // 彩蛋#1标志位
 
     // 遍历参数
     let mut i = 1;
@@ -22,28 +21,25 @@ fn main() {
             "taskarg" => easter_egg_1 = true,
 
             "-num" => {
-                if i+1 < args.len() {
-                    let num = &args[i+1];
+                if i + 1 < args.len() {
+                    let num = &args[i + 1];
 
                     if let Ok(n @ 1..=100) = num.parse::<u8>() {
-                        
                         let num: u8 = n;
 
                         custom_number = (true, *&num);
 
                         // 跳过下一个参数，因为
                         i += 1;
-                        
                     } else {
                         println!("错误：参数-num的无效输入{}", num);
                     }
-                    
                 } else {
                     println!("错误：参数-num未指定值");
                 }
             }
 
-            other => println!("未知的参数：{}", other)
+            other => println!("未知的参数：{}", other),
         }
         i += 1;
     }
@@ -58,15 +54,13 @@ fn main() {
     } else {
         rand::rng().random_range(1..100)
     };
-    
+
     // 猜错计数
     let mut cycle_count: u32 = 0;
 
     loop {
         if cycle_count > 0 {
-
             println!("你猜错了{cycle_count}次。");
-
         }
 
         print!("请输入你的猜测：");
@@ -74,9 +68,7 @@ fn main() {
 
         let mut guess = String::new();
 
-        io::stdin()
-            .read_line(&mut guess)
-            .expect("?");
+        io::stdin().read_line(&mut guess).expect("?");
 
         // 将字符串型转换为整形，解析失败时提示并继续循环
         let guess: u8 = match guess.trim().parse() {
@@ -105,5 +97,4 @@ fn main() {
     println!("按回车退出...");
     let mut _exit = String::new();
     io::stdin().read_line(&mut _exit).ok();
-    
 }
