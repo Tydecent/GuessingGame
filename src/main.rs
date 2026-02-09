@@ -1,8 +1,13 @@
 use std::env;
 use std::io;
 use std::io::Write;
+use std::process::exit;
 
 use rand::Rng; // 随机数生成器
+
+// 从环境变量获取版本信息（编译时注入）
+const BUILD_TIME: &str = env!("BUILD_TIME");
+const GIT_HASH: &str = env!("GIT_HASH");
 
 fn main() {
     let args: Vec<String> = env::args().collect(); // 获取所有启动参数
@@ -16,10 +21,13 @@ fn main() {
         let now_arg = &args[i];
 
         match now_arg.as_str() {
+            // 调试模式
             "-debug" => _debugmode = true,
 
+            // 彩蛋#1
             "taskarg" => easter_egg_1 = true,
 
+            // 自定义数字
             "-num" => {
                 if i + 1 < args.len() {
                     let num = &args[i + 1];
@@ -29,7 +37,7 @@ fn main() {
 
                         custom_number = (true, *&num);
 
-                        // 跳过下一个参数，因为
+                        // 跳过下一个参数，因为下一个参数是值
                         i += 1;
                     } else {
                         println!("错误：参数-num的无效输入{}", num);
@@ -37,6 +45,18 @@ fn main() {
                 } else {
                     println!("错误：参数-num未指定值");
                 }
+            }
+
+            // 查询版本
+            "-version" => {
+                println!(
+                    "{} {} ({} {})",
+                    env!("CARGO_PKG_NAME"),
+                    env!("CARGO_PKG_VERSION"),
+                    GIT_HASH,
+                    BUILD_TIME
+                );
+                exit(0);
             }
 
             other => println!("未知的参数：{}", other),
@@ -59,10 +79,6 @@ fn main() {
     let mut cycle_count: u32 = 0;
 
     loop {
-        if cycle_count > 0 {
-            println!("你猜错了{cycle_count}次。");
-        }
-
         print!("请输入你的猜测：");
         io::stdout().flush().expect("刷新输出缓冲区失败"); // 刷新缓冲区（由于print!宏没有换行符，故行缓冲模式不会自动刷新缓冲区）
 
@@ -89,8 +105,6 @@ fn main() {
         } else if guess == secret_number {
             println!("你猜对了！你之前猜错了{cycle_count}次。");
             break;
-        } else {
-            println!("如果你成功看到这行文字，游戏开发者向你致敬。");
         }
     }
 
